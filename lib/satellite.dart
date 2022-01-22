@@ -1,17 +1,34 @@
 import 'dart:io';
 import 'package:cs_467_arcore/julianday.dart';
 import 'package:sgp4_sdp4/sgp4_sdp4.dart';
+import 'package:json_annotation/json_annotation.dart';
+part 'satellite.g.dart';
 
+@JsonSerializable()
 class Satellite {
-  String name = "ISS";
-  final int id = 25544;
-  List<String> tleData = [];
+  /* Json populated values */
+  int satid;
+  String satname;
+  String intDesignator;
+  String launchDate;
+  double satlat;
+  double satlng;
+  double satalt;
+
+  /* Function Populated */
   final Site myLocation = Site.fromLatLngAlt(46.59271, -112.03611, 59 / 1000);
   //Site.fromLatLngAlt(23.1359405517578, -82.3583297729492, 59 / 1000.0);
+  List<String> tleData = [];
 
-  Satellite(int id) {
-    _getTle(id);
+  Satellite(this.satid, this.satname, this.intDesignator, this.launchDate,
+      this.satlat, this.satlng, this.satalt) {
+    _getTle(satid);
   }
+
+  factory Satellite.fromJson(Map<String, dynamic> json) =>
+      _$SatelliteFromJson(json);
+
+  //Map<String, dynamic> toJson() => _$SatellitetoJson(this);
 
   void _getTle(satid) {
     tleData = _apiReturn(satid);
@@ -25,9 +42,9 @@ class Satellite {
     ];
   }
 
-  List<double> getCurrentPosition(id) {
+  List<double> getCurrentPosition() {
     /// Parse the TLE
-    final TLE tleSGP4 = TLE(name, tleData[0], tleData[1]);
+    final TLE tleSGP4 = TLE(satname, tleData[0], tleData[1]);
 
     ///Create a orbit object and print if is
     ///SGP4, for "near-Earth" objects, or SDP4 for "deep space" objects.
@@ -47,6 +64,7 @@ class Satellite {
     if (coord.lon > PI) coord.lon -= TWOPI;
 
     CoordTopo topo = myLocation.getLookAngle(eciPos);
+    /*
     print("\n\n");
     print("lat: ${rad2deg(coord.lat)}");
     print("lng: ${rad2deg(coord.lon)}");
@@ -55,7 +73,9 @@ class Satellite {
     print("Height: ${coord.alt}");
     print("Range: ${topo.range}");
     print("Period: ${(orbit.period() / 60.0).round()} min");
-
-    return [rad2deg(coord.lat), rad2deg(coord.lon)];
+    */
+    satlat = rad2deg(coord.lat);
+    satlng = rad2deg(coord.lon);
+    return [satlat, satlng];
   }
 }

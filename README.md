@@ -18,3 +18,4 @@ samples, guidance on mobile development, and a full API reference.
 Eric G.  - Just doing an initial check in - confirm end to end process.
 Eric G.  - And a branch and PR request.
 Eric G. - Just add #1zgbwzc to the commite message to see what happens in Clickup
+goetsche 10:05 - 22JAN2022 - Basic form for TLE data solidified into 2 main classes.  Satellites and Satellite.
