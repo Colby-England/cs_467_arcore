@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "55461266296",
+    "project_id": "sattrack-38e23",
+    "storage_bucket": "sattrack-38e23.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55461266296:android:17ff84659a5f29c0003e8d",
+        "android_client_info": {
+          "package_name": "com.example.cs_467_arcore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "55461266296-8avedie3u6nin2keumic267osf0820mg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgWz61rQrKPrj6T6NvTP6HccRHA8VtmWo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "55461266296-8avedie3u6nin2keumic267osf0820mg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
