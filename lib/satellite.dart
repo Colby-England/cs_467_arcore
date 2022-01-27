@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cs_467_arcore/julianday.dart';
 import 'package:sgp4_sdp4/sgp4_sdp4.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -63,7 +62,7 @@ class Satellite {
     final CoordGeo coord = eciPos.toGeo();
     if (coord.lon > PI) coord.lon -= TWOPI;
 
-    CoordTopo topo = myLocation.getLookAngle(eciPos);
+    // CoordTopo topo = myLocation.getLookAngle(eciPos);
     /*
     print("\n\n");
     print("lat: ${rad2deg(coord.lat)}");

@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             onTap: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => DebugOptionsWidget()));
+                  .push(MaterialPageRoute(builder: (context) => const DebugOptionsWidget()));
             },
             title: const Text('AR Hello World'),
           )
