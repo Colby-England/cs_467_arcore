@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
                   .push(MaterialPageRoute(builder: (context) => const DebugOptionsWidget()));
             },
             title: const Text('AR Hello World'),
-          )
+          ),
         ]
       )
     );
