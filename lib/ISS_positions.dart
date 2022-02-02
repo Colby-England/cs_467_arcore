@@ -2,10 +2,11 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'dart:developer';
 
 void main(List<String> arguments) {
-  final lat = '37.713';
-  final lng = '-119.605';
+  const lat = '37.713';
+  const lng = '-119.605';
   final alt = getAltitude(lat, lng);
   List<int> desiredSats = const [25544]; // just the ISS for now
   satLocation(desiredSats, lat, lng, alt);
@@ -17,7 +18,7 @@ dynamic getJson(String url) async {
   if (response.statusCode == 200) {
     return convert.jsonDecode(response.body);
   } else {
-    print('Request failed with status: ${response.statusCode}.');
+    log('Request failed with status: ${response.statusCode}.');
     exit(1);
   }
 }
