@@ -1,33 +1,25 @@
 import 'package:geolocator/geolocator.dart';
 
-class DeviceLocation {
-  /* Should be able to access the device location using these three functions. 
-  Need to call getDeviceLocation to see if we need permissions, get them if 
-  needed, and return the Lat Long.*/
-  void getDeviceLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse) {
-      getLocation();
-    } else {
-      requestLocationPermission();
+Future<Position> determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
     }
   }
 
-  requestLocationPermission() async {
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse) {
-      getLocation();
-    } else {
-      requestLocationPermission();
-    }
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
   }
-
-  getLocation() async {
-    Position location = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 1));
-    return (location);
-  }
+  return await Geolocator.getCurrentPosition();
 }
