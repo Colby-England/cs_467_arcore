@@ -12,17 +12,17 @@ import 'dart:convert';
 import 'package:cs_467_arcore/satellite.dart';
 
 class Satellites {
-  /* Top level, retrieve a JSON encoded string from API-Whatsup? */
-  String jsonWhatsup =
+  /* TODO: Implement the API call for WhatsUP? */
+  String jsonWhatsup = //Should be API call
       '{"info":{"category":"Amateur radio","transactionscount":0,"satcount":2},"above":[{"satid":14129,"satname":"OSCAR 10","intDesignator":"1983-058B","launchDate":"1983-06-16","satlat":2.8426,"satlng":-64.823,"satalt":21156.2364},{"satid":46839,"satname":"BY70-3","intDesignator":"2020-079N","launchDate":"2020-11-06","satlat":44.2454,"satlng":-74.7064,"satalt":458.6398}]}';
   List<Satellite> satellites = [];
   final Satellite? nullSat = null;
 
-  Satellites() {
+  Satellites() { // Constructor, load the json
     parseJson(jsonWhatsup);
   }
 
-  parseJson(String jsonSat) {
+  parseJson(String jsonSat) { // map Json into map object
     mapSatellite(jsonDecode(jsonWhatsup));
   }
 
