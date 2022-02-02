@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:async';
+
 import 'package:ar_flutter_plugin/datatypes/node_types.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:flutter/material.dart';
@@ -28,10 +31,39 @@ class _TrackingMap extends State<TrackingMap> {
   final String _planeTexturePath = "Images/triangle.png";
   final bool _handleTaps = false;
 
+  Timer? _timer;
+
+  // @override
+  // void initState() {
+  //   _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+  //     setState(() {
+  //       var newScale = Random().nextDouble() / 3;
+  //       var newTranslationAxis = Random().nextInt(3);
+  //       var newTranslationAmount = Random().nextDouble() / 3;
+  //       var newTranslation = Vector3(0, 0, 0);
+  //       newTranslation[newTranslationAxis] = newTranslationAmount;
+  //       var newRotationAxisIndex = Random().nextInt(3);
+  //       var newRotationAmount = Random().nextDouble();
+  //       var newRotationAxis = Vector3(0, 0, 0);
+  //       newRotationAxis[newRotationAxisIndex] = 1.0;
+
+  //       final newTransform = Matrix4.identity();
+
+  //       newTransform.setTranslation(newTranslation);
+  //       newTransform.rotate(newRotationAxis, newRotationAmount);
+  //       newTransform.scale(newScale);
+
+  //       localObjectNode.transform = newTransform;
+  //     });
+  //    });
+  //    super.initState();
+  // }
+
   @override
   void dispose() {
     super.dispose();
     arSessionManager.dispose();
+    _timer?.cancel();
   }
 
   @override
@@ -157,6 +189,7 @@ class _TrackingMap extends State<TrackingMap> {
         }
         this.arSessionManager.onError(error.toString());
       });
+      // onLoadObject();
     }
 
   void showAlertDialog(BuildContext context, String title, String content, String buttonText, Function buttonFunction, String cancelButtonText) {
@@ -204,6 +237,37 @@ class _TrackingMap extends State<TrackingMap> {
       rotation: Vector4(1.0, 0.0, 0.0, 0.0)
     );
     arObjectManager.addNode(newNode);
+    localObjectNode = newNode;
+  }
+
+  Future<void> onMoveObject() async {
+    // var newNode = ARNode(
+    //   type: NodeType.webGLB, 
+    //   uri: "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
+    //   scale: Vector3(0.2, 0.2, 0.2),
+    //   position: Vector3(1.0, 0.0, 0.0),
+    //   rotation: Vector4(1.0, 0.0, 0.0, 0.0)
+    // );
+    // arObjectManager.removeNode(localObjectNode);
+    // arObjectManager.addNode(newNode);
+    // localObjectNode = newNode;
+    var newScale = Random().nextDouble() / 3;
+    var newTranslationAxis = Random().nextInt(3);
+    var newTranslationAmount = Random().nextDouble() / 3;
+    var newTranslation = Vector3(0, 0, 0);
+    newTranslation[newTranslationAxis] = newTranslationAmount;
+    var newRotationAxisIndex = Random().nextInt(3);
+    var newRotationAmount = Random().nextDouble();
+    var newRotationAxis = Vector3(0, 0, 0);
+    newRotationAxis[newRotationAxisIndex] = 1.0;
+
+    final newTransform = Matrix4.identity();
+
+    newTransform.setTranslation(newTranslation);
+    newTransform.rotate(newRotationAxis, newRotationAmount);
+    newTransform.scale(newScale);
+
+    localObjectNode.transform = newTransform;
   }
 
 }
