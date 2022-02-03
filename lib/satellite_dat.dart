@@ -1,7 +1,7 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:satellite_dat/satellite_dat.dart';
+// import 'package:satellite_dat/satellite_dat.dart';
 
 void main(List<String> arguments) async {
   dynamic tle = await getTLE();

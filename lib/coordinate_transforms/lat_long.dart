@@ -62,6 +62,8 @@ List<double> transformCoords(List<double> original, double angle, double scale) 
   double orgY = original[1];
   double orgZ = original[2];
 
+  angle = deg2rad(angle);
+
   double newX = ((cos(angle) * orgX - sin(angle) * orgX) * scale);
   double newY = ((sin(angle) * orgY + cos(angle) * orgY) * scale);
   double newZ = orgZ * scale;

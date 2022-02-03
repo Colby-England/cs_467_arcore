@@ -11,7 +11,6 @@ class Counter {
   void decrement() => value--;
 }
 
-
 void main() {
   runApp(const SatTrack());
 }
