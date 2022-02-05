@@ -1,7 +1,10 @@
 import 'package:cs_467_arcore/satellite.dart';
 import 'package:cs_467_arcore/satellites.dart';
-import 'package:flutter/material.dart';
-import 'app.dart';
+//import 'package:flutter/material.dart';
+//import 'app.dart';
+import 'dart:convert' as convert;
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class Counter {
   int value = 0;
@@ -10,15 +13,17 @@ class Counter {
 
   void decrement() => value--;
 }
-
+/*
 void main() {
   runApp(const SatTrack());
 }
+*/
 
-/*
-void main(){
+void main() async {
 // This will initialize a list of satellites and populate a list of them.
 final Satellites satsAbove = Satellites();
+await satsAbove.getApiWhatsup();
+print(satsAbove.jsonWhatsup);
 /*
 IE: satsAbove will have a <List>satellites, that list contains satellite objects
 class with various vars/functions.
@@ -49,21 +54,26 @@ in the Map<> is just an increment... 1, 2, 3 4.  Ordered by time smallest to lar
   2:<LocationDetail>
 }
 Location Detail will contain all of the following details for each calculated position:
+
+## Updated : _getTLE is no longer part of the instantiation as a result of the
+async call.  It now has to be "awaited" in a call from the main loop.
 */
 
 for (final Satellite sat in satsAbove.satellites){
+  await sat.getTle(sat.satid);
   sat.getPosition(numberOfCalcs:10, durationMinutes: 1); // Calculate 10 positions in 1 minute intervals.
   
   for(final int key in sat.calculatedPositions.keys){
     print(
-      sat.calculatedPositions[key]!.satid.toString() + "_" +
-      sat.calculatedPositions[key]!.satlat.toString() + "_" +
-      sat.calculatedPositions[key]!.satlng.toString()  + "_" +
-      sat.calculatedPositions[key]!.sataz .toString()  + "_" +
+      "satid:-> " + sat.calculatedPositions[key]!.satid.toString() + " SatLat:-> " +
+      sat.calculatedPositions[key]!.satlat.toString() + " SatLong:-> " +
+      sat.calculatedPositions[key]!.satlng.toString()  + " SatHeight:-> " +
+      sat.calculatedPositions[key]!.satheight .toString()  + " SatUtcTime:-> " +
       sat.calculatedPositions[key]!.utcTime .toString()
       );
   }
 print("\n");
 }
 }
-*/
+///*/
+

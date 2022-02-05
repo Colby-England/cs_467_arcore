@@ -1,18 +1,25 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 import 'package:http/http.dart' as http;
-// import 'package:satellite_dat/satellite_dat.dart';
+import 'package:sync_http/sync_http.dart';
 
 void main(List<String> arguments) async {
-  dynamic tle = await getTLE();
+  dynamic tle = await getTLE(10);
   print(tle);
 }
 
-dynamic getTLE([String id = "25544"]) async {
+Future<String> getTLE(int satid) async {
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
   var jsonRepsonse = await getJson(
-      'https://api.n2yo.com/rest/v1/satellite/tle/$id&apiKey=$key');
+      'https://api.n2yo.com/rest/v1/satellite/tle/$satid&apiKey=$key');
   return (jsonRepsonse['tle']);
+}
+
+Future<Map<String, dynamic>> getWhatsup() async {
+  String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
+  var jsonRepsonse = await getJson(
+      'https://api.n2yo.com/rest/v1/satellite/above/41.702/-76.014/0/70/18/&apiKey=$key');
+  return (jsonRepsonse);
 }
 
 dynamic getJson(String url) async {

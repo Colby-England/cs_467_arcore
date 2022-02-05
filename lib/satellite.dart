@@ -1,14 +1,18 @@
 import 'package:cs_467_arcore/julianday.dart';
+import 'package:cs_467_arcore/satellite_dat.dart';
 import 'package:sgp4_sdp4/sgp4_sdp4.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 part 'satellite.g.dart';
+
 
 class locationDetail{
   int satid = 0;
   double satlat = 0.0;
   double satlng = 0.0;
-  double satalt = 0.0;
-  double sataz = 0.0;
+  double satheight = 0.0;
   double utcTime = 0.0;
 }
 
@@ -34,22 +38,16 @@ class Satellite {
 
   Satellite(this.satid, this.satname, this.intDesignator, this.launchDate,
       this.satlat, this.satlng, this.satalt) {
-    _getTle(satid); // API call to get TLE data for This satellite object.
+    // _getTle(satid); // API call to get TLE data for This satellite object.
   }
 
   factory Satellite.fromJson(Map<String, dynamic> json) =>
       _$SatelliteFromJson(json);
 
-  void _getTle(satid) {
-    tleData = _apiReturn(satid);
-  }
-
-  List<String> _apiReturn(satid) {
-    //TODO : implement the API call for TLE data based on this satid.
-    return [
-      "1 25544U 98067A   22021.57497024  .00045667  00000-0  81365-3 0  9998",
-      "2 25544  51.6437 342.6425 0007051  40.5873 110.0531 15.49622456322444"
-    ];
+  Future <void> getTle(int satid) async{
+    var apiString = await getTLE(satid);
+    LineSplitter ls = LineSplitter();
+    tleData = ls.convert(apiString);
   }
 
   void getPosition({int numberOfCalcs = 5, int durationMinutes=1}) {
@@ -88,8 +86,7 @@ class Satellite {
       newLocation.satid = satid;
       newLocation.satlat = rad2deg(coord.lat);
       newLocation.satlng = rad2deg(coord.lon);
-      newLocation.satalt = rad2deg(topo.el); //Elevation in degrees
-      newLocation.sataz = rad2deg(topo.az); //Azimuth in degrees
+      newLocation.satheight = coord.alt;
       newLocation.utcTime = utcTime;
       calculatedPositions[i] = newLocation;
       durationMinutes += durationMinutes;
