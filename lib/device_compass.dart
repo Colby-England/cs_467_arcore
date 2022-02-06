@@ -1,35 +1,26 @@
-import 'dart:math' as math;
-import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
 
-void determineHeading() => runApp(const CompassApp());
-
-class CompassApp extends StatefulWidget {
-  const CompassApp({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  _CompassAppState createState() => _CompassAppState();
-}
-
-class _CompassAppState extends State<CompassApp> {
-  bool _hasPermissions = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _fetchPermissionStatus();
+class DeviceCompass {
+  /*Access the getDeviceHeading() function to get the compass bearing. The
+  heading will be returned type double. */
+  void getDeviceHeading() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      getHeading();
+    } else {
+      requestLocationPermission();
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (_hasPermissions) {
-      return getHeading();
+  requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      getHeading();
     } else {
-      return _buildPermissionSheet();
+      requestLocationPermission();
     }
   }
 
@@ -41,41 +32,5 @@ class _CompassAppState extends State<CompassApp> {
     }
     double? ccHeading = (heading - 360).abs();
     return ccHeading;
-  }
-
-  Widget _buildPermissionSheet() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Text('Compass Permission Required'),
-          ElevatedButton(
-            child: const Text('Request Permissions'),
-            onPressed: () {
-              Permission.locationWhenInUse.request().then((ignored) {
-                _fetchPermissionStatus();
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            child: const Text('Open App Settings'),
-            onPressed: () {
-              openAppSettings().then((opened) {
-                //
-              });
-            },
-          )
-        ],
-      ),
-    );
-  }
-
-  void _fetchPermissionStatus() {
-    Permission.locationWhenInUse.status.then((status) {
-      if (mounted) {
-        setState(() => _hasPermissions = status == PermissionStatus.granted);
-      }
-    });
   }
 }
