@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../satellites.dart';
 import 'tracking_map.dart';
 import 'hello_world.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  Satellites satData;
+  HomeScreen(this.satData, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +27,41 @@ class HomeScreen extends StatelessWidget {
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (context) => const DebugOptionsWidget()));
             },
-            title: const Text('AR Hello World'),
+            title: Text('AR Hello World'),
           ),
+          SingleChildScrollView(
+          child:Padding(
+            padding: EdgeInsets.all(10),
+            child:Column(
+                  children: getSatData(satData),
+          )
+          )
+          )
         ]
       )
     );
   }
+}
+
+List<Widget> getSatData(Satellites satData){
+  List<Widget> rlist = [];
+  for(var sat in satData.satellites){
+    rlist.add(Column(children: [
+      Row(
+          children:[
+          Text("SatName: ${sat.satname}"),
+          ],
+      ),
+      Column(children: [          
+        Text("Latitude: ${sat.satlat.toString()}"),
+        Text("Longitude: ${sat.satlat.toString()}"),
+        Text("Height/Altitude: ${sat.satalt.toString()}")],
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+        )]
+      )
+      );
+  }
+  return rlist;
 }
