@@ -1,8 +1,10 @@
+import 'package:cs_467_arcore/satellites.dart';
 import 'package:flutter/material.dart';
 import 'screens/home.dart';
 
 class SatTrack extends StatelessWidget {
-  const SatTrack({Key? key}) : super(key: key);
+  Satellites satData;
+  SatTrack(this.satData, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +13,7 @@ class SatTrack extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey
       ),
-      home:  const HomeScreen(),
+      home: HomeScreen(satData),
     );
   }
 }

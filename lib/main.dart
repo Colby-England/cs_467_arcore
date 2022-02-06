@@ -1,7 +1,7 @@
 import 'package:cs_467_arcore/satellite.dart';
 import 'package:cs_467_arcore/satellites.dart';
-//import 'package:flutter/material.dart';
-//import 'app.dart';
+import 'package:flutter/material.dart';
+import 'app.dart';
 import 'dart:convert' as convert;
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -13,12 +13,20 @@ class Counter {
 
   void decrement() => value--;
 }
-/*
-void main() {
-  runApp(const SatTrack());
-}
-*/
 
+void main() async {
+  final Satellites satsAbove = Satellites();
+  await satsAbove.getApiWhatsup();  // Call the Whatsup API
+
+  for (final Satellite sat in satsAbove.satellites){
+    await sat.getTle(sat.satid);
+    sat.getPosition(numberOfCalcs:10, durationMinutes: 1); // Calculate 10 positions in 1 minute intervals.
+  }
+  
+  runApp(SatTrack(satsAbove));
+}
+
+/*
 void main() async {
 // This will initialize a list of satellites and populate a list of them.
 final Satellites satsAbove = Satellites();
@@ -75,5 +83,5 @@ for (final Satellite sat in satsAbove.satellites){
 print("\n");
 }
 }
-///*/
+*/
 
