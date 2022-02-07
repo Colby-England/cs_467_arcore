@@ -43,31 +43,31 @@ class _TrackingMap extends State<TrackingMap> {
 
   Timer? _timer;
 
-  // @override
-  // void initState() {
-  //   _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-  //     setState(() {
-  //       var newScale = Random().nextDouble() / 3;
-  //       var newTranslationAxis = Random().nextInt(3);
-  //       var newTranslationAmount = Random().nextDouble() / 3;
-  //       var newTranslation = Vector3(0, 0, 0);
-  //       newTranslation[newTranslationAxis] = newTranslationAmount;
-  //       var newRotationAxisIndex = Random().nextInt(3);
-  //       var newRotationAmount = Random().nextDouble();
-  //       var newRotationAxis = Vector3(0, 0, 0);
-  //       newRotationAxis[newRotationAxisIndex] = 1.0;
+  @override
+  void initState() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      setState(() {
+        var newScale = Random().nextDouble() / 3;
+        var newTranslationAxis = Random().nextInt(3);
+        var newTranslationAmount = Random().nextDouble() / 3;
+        var newTranslation = Vector3(0, 0, 0);
+        newTranslation[newTranslationAxis] = newTranslationAmount;
+        var newRotationAxisIndex = Random().nextInt(3);
+        var newRotationAmount = Random().nextDouble();
+        var newRotationAxis = Vector3(0, 0, 0);
+        newRotationAxis[newRotationAxisIndex] = 1.0;
 
-  //       final newTransform = Matrix4.identity();
+        final newTransform = Matrix4.identity();
 
-  //       newTransform.setTranslation(newTranslation);
-  //       newTransform.rotate(newRotationAxis, newRotationAmount);
-  //       newTransform.scale(newScale);
+        newTransform.setTranslation(newTranslation);
+        newTransform.rotate(newRotationAxis, newRotationAmount);
+        newTransform.scale(newScale);
 
-  //       localObjectNode.transform = newTransform;
-  //     });
-  //    });
-  //    super.initState();
-  // }
+        localObjectNode.transform = newTransform;
+      });
+     });
+     super.initState();
+  }
 
   @override
   void dispose() {
@@ -112,7 +112,7 @@ class _TrackingMap extends State<TrackingMap> {
                           onPressed: () => {
                             showPos(context)
                           },
-                          child: const Text('Load Image'))
+                          child: const Text('Show Origin Location'))
                       ]
                     )
                   ])
@@ -211,7 +211,7 @@ class _TrackingMap extends State<TrackingMap> {
         }
         this.arSessionManager.onError(error.toString());
       });
-      // onLoadObject();
+      onLoadObject();
     }
 
   void showAlertDialog(BuildContext context, String title, String content, String buttonText, Function buttonFunction, String cancelButtonText) {
@@ -292,43 +292,4 @@ class _TrackingMap extends State<TrackingMap> {
     localObjectNode.transform = newTransform;
   }
 
-  Future<void> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the 
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale 
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-    
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately. 
-      return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-    } 
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    Position origin = await Geolocator.getCurrentPosition();
-    originAlt = origin.altitude;
-    originLat = origin.latitude;
-    originLon = origin.longitude;
-  }
 }
