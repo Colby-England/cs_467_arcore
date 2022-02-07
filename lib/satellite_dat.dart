@@ -3,10 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:sync_http/sync_http.dart';
 
-void main(List<String> arguments) async {
-  dynamic tle = await getTLE(10);
-  print(tle);
-}
 
 Future<String> getTLE(int satid) async {
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
