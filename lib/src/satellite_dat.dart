@@ -12,25 +12,21 @@ Future<String> getTLE(int satid) async {
 }
 
 Future<Map<String, dynamic>> getWhatsup() async {
-/*   Position origin = await determinePosition();
+  Position _currentPosition;
+  Position origin = await determinePosition();
 
-  String originAlt = origin.altitude.toString();
-  String originLat = origin.latitude.toString();
-  String originLng = origin.longitude.toString();  */
+  String obsAlt = origin.altitude.toString();
+  String obsLat = origin.latitude.toString();
+  String obsLng = origin.longitude.toString();
 
-/*   Future<Position> origin = determinePosition();
-  origin.then((value) {
-    originAlt = value.altitude;
-    originLat = value.latitude;
-    originLon = value.longitude;
-  }); */
-  String obsAlt = '38';
-  String obsLat = '-81';
-  String obsLng = '270';
+  String radius = '10';
+
+  String category = '0'; // 0 for all categories
 
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
-  var jsonRepsonse = await getJson(
-      'https://api.n2yo.com/rest/v1/satellite/above/$obsLat/$obsLng/$obsAlt//18/&apiKey=$key');
+  var jsonRepsonse =
+      await getJson('https://api.n2yo.com/rest/v1/satellite/above/'
+          '$obsLat/$obsLng/$obsAlt/$radius/$category/&apiKey=$key');
   return (jsonRepsonse);
 }
 

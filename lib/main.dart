@@ -10,17 +10,7 @@ class Counter {
 }
 
 void main() async {
-  final Satellites satsAbove = Satellites();
-  await satsAbove.getApiWhatsup(); // Call the Whatsup API
-
-  for (final Satellite sat in satsAbove.satellites) {
-    await sat.getTle(sat.satid);
-    sat.getPosition(
-        numberOfCalcs: 10,
-        durationMinutes: 1); // Calculate 10 positions in 1 minute intervals.
-  }
-
-  runApp(SatTrack(satsAbove));
+  runApp(SatTrack());
 }
 
 
