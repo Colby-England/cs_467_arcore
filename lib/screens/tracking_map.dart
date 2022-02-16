@@ -16,7 +16,7 @@ import 'package:ar_flutter_plugin/managers/ar_anchor_manager.dart';
 import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
 import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
 
-import '../device_location.dart';
+import '../src/device_location.dart';
 
 
 class TrackingMap extends StatefulWidget {
