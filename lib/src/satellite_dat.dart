@@ -19,9 +19,9 @@ Future<Map<String, dynamic>> getWhatsup() async {
   String obsLat = origin.latitude.toString();
   String obsLng = origin.longitude.toString();
 
-  String radius = '10';
+  String radius = '90';
 
-  String category = '0'; // 0 for all categories
+  String category = '18'; // 0 for all categories, 18 for amateur radio sats
 
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
 
