@@ -2,6 +2,9 @@ import 'satellites.dart';
 import 'package:flutter/material.dart';
 import '../screens/home.dart';
 import 'satellite.dart';
+import 'package:cs_467_arcore/src/device_location.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 class SatTrack extends StatelessWidget {
   SatTrack({Key? key}) : super(key: key);
@@ -25,14 +28,17 @@ class SatTrack extends StatelessWidget {
   }
 
   Future<Satellites> get satData async {
+
+    final Position originPos = await determinePosition();
+
     final Satellites satsAbove = Satellites();
     await satsAbove.getApiWhatsup(); // Call the Whatsup API
 
     for (final Satellite sat in satsAbove.satellites) {
       await sat.getTle(sat.satid);
       sat.getPosition(
-          numberOfCalcs: 10,
-          durationMinutes: 1); // Calculate 10 positions in 1 minute intervals.
+          numberOfCalcs: 20,
+          durationMinutes: 1, originPos: originPos); // Calculate 10 positions in 1 minute intervals.
     }
     return satsAbove;
   }

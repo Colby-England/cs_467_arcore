@@ -1,3 +1,5 @@
+import 'package:cs_467_arcore/utilities.dart';
+
 import 'julianday.dart';
 import 'satellite_dat.dart';
 import 'package:sgp4_sdp4/sgp4_sdp4.dart';
@@ -13,6 +15,8 @@ class locationDetail {
   double satlng = 0.0;
   double satheight = 0.0;
   double utcTime = 0.0;
+  double azimuth = 0.0;
+  double elevation = 0.0;
 }
 
 @JsonSerializable()
@@ -48,8 +52,10 @@ class Satellite {
     tleData = ls.convert(apiString);
   }
 
-  void getPosition({int numberOfCalcs = 5, int durationMinutes = 1}) {
+  void getPosition({int numberOfCalcs = 5, int durationMinutes = 1, Position? originPos}) {
     var startTime = DateTime.now();
+
+    Site myLocation = Site.fromLatLngAlt(originPos!.latitude, originPos.longitude, originPos.altitude / 1000);
 
     int i = 0;
     while (i <= numberOfCalcs) {
@@ -87,6 +93,8 @@ class Satellite {
       newLocation.satlng = rad2deg(coord.lon);
       newLocation.satheight = coord.alt;
       newLocation.utcTime = utcTime;
+      newLocation.azimuth = rad2deg(topo.az);
+      newLocation.elevation = rad2deg(topo.el);
       calculatedPositions[i] = newLocation;
       durationMinutes += durationMinutes;
       i += 1;

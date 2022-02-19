@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../src/satellites.dart';
+// import '../satellites.dart';
+import 'package:cs_467_arcore/src/satellites.dart';
 import 'tracking_map.dart';
 import 'hello_world.dart';
+
 
 class HomeScreen extends StatelessWidget {
   Satellites satData;
@@ -18,7 +20,7 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             onTap: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => const TrackingMap()));
+                  .push(MaterialPageRoute(builder: (context) => TrackingMap(satData)));
             },
             title: const Text('Tracking Map'),
           ),

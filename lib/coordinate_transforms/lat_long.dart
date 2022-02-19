@@ -38,7 +38,7 @@ List<double> latLongECEF(double lat, double long, double alt) {
 }
 
 /// Convert ECEF coordinates to ENU coordinates from a reference location
-List<double> ecefToENU(List<double> src, List<double> dst) {
+List<double> ecefToENU(List<double> src, List<double> dst, double myLong, double myLat) {
 
   final xDelta = dst[0] - src[0];
   final yDelta = dst[1] - src[1];
@@ -69,4 +69,24 @@ List<double> transformCoords(List<double> original, double angle, double scale) 
   double newZ = orgZ * scale;
 
   return [newX, newY, newZ];
+}
+
+/// given a vector normalize it so it's length is 1.
+List<double> normalize(List<double> vector) {
+  double xSquared = vector[0] * vector[0];
+  double ySquared = vector[1] * vector[1];
+  double zSquared = vector[2] * vector[2];
+
+  double length = pow(xSquared + ySquared + zSquared, 0.5).toDouble();
+
+  return [vector[0] / length, vector[1] / length, vector[2] / length];
+}
+
+List<double> polarToCart(double radius, double elevation, double azimuth) {
+
+  double x = radius * sin(deg2rad(90 - elevation)) * cos(deg2rad(360 - azimuth));
+  double y = radius * sin(deg2rad(90 - elevation)) * sin(deg2rad(360 - azimuth));
+  double z = radius * cos(deg2rad(90 - elevation));
+
+  return [x, y, z];
 }

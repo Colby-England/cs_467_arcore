@@ -1,12 +1,15 @@
 import 'dart:math';
 import 'dart:async';
 
+import 'package:cs_467_arcore/coordinate_transforms/lat_long.dart';
 import 'package:flutter/material.dart';
 import '../utilities.dart';
 
 
 class TrackingMap extends StatefulWidget {
-  const TrackingMap({Key? key}) : super(key: key);
+  final Satellites satData;
+
+  const TrackingMap(this.satData, {Key? key}) : super(key: key);
 
   @override
   _TrackingMap createState() => _TrackingMap();
@@ -26,30 +29,37 @@ class _TrackingMap extends State<TrackingMap> {
   late double originLat;
   late double originLon;
   late double originAlt;
+  late List<double> originECEF;
+  late List<ARNode> nodes;
+  int count = 0;
+  int countTwo = 0;
+
 
   Timer? _timer;
 
   @override
   void initState() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+
       setState(() {
-        var newScale = Random().nextDouble() / 3;
-        var newTranslationAxis = Random().nextInt(3);
-        var newTranslationAmount = Random().nextDouble() / 3;
-        var newTranslation = Vector3(0, 0, 0);
-        newTranslation[newTranslationAxis] = newTranslationAmount;
-        var newRotationAxisIndex = Random().nextInt(3);
-        var newRotationAmount = Random().nextDouble();
-        var newRotationAxis = Vector3(0, 0, 0);
-        newRotationAxis[newRotationAxisIndex] = 1.0;
+        
+        // first pass through place current sat position
+        if (count == 0) {
 
-        final newTransform = Matrix4.identity();
+          nodes = List<ARNode>.filled(widget.satData.satellites.length, ARNode(type: NodeType.webGLB, uri: "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb"));
 
-        newTransform.setTranslation(newTranslation);
-        newTransform.rotate(newRotationAxis, newRotationAmount);
-        newTransform.scale(newScale);
-
-        localObjectNode.transform = newTransform;
+          for (int i = 0; i < widget.satData.satellites.length; i++) {
+            List<double> scale = polarToCart(30, widget.satData.satellites[i].calculatedPositions[0]!.elevation, widget.satData.satellites[i].calculatedPositions[0]!.azimuth);
+            loadSatellites(scale, i);
+          }
+          count++;
+        } else {
+          for (int j = 0; j < widget.satData.satellites.length; j++) {
+            List<double> scale = polarToCart(30, widget.satData.satellites[j].calculatedPositions[countTwo]!.elevation, widget.satData.satellites[j].calculatedPositions[countTwo]!.azimuth);
+            nodes[j].position = Vector3(scale[0], scale[2], scale[1]);
+          }
+          countTwo++;
+        }
       });
     });
     super.initState();
@@ -72,6 +82,7 @@ class _TrackingMap extends State<TrackingMap> {
       originAlt = value.altitude;
       originLat = value.latitude;
       originLon = value.longitude;
+      originECEF = latLongECEF(originLat, originLon, originAlt);
     });
 
     return Scaffold(
@@ -193,7 +204,7 @@ class _TrackingMap extends State<TrackingMap> {
       }
       this.arSessionManager.onError(error.toString());
     });
-    onLoadObject();
+    // onLoadObject();
   }
 
   void showAlertDialog(BuildContext context, String title, String content,
@@ -238,7 +249,7 @@ class _TrackingMap extends State<TrackingMap> {
         type: NodeType.webGLB,
         uri:
             "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-        scale: Vector3(1.0, 1.0, 1.0),
+        scale: Vector3(0.3, 0.3, 0.3),
         position: Vector3(0.0, 30, 0.0),
         rotation: Vector4(1.0, 0.0, 0.0, 0.0));
     arObjectManager.addNode(newNode);
@@ -274,4 +285,18 @@ class _TrackingMap extends State<TrackingMap> {
 
     localObjectNode.transform = newTransform;
   }
+
+  Future<void> loadSatellites(List<double> pos, int index) async {
+
+    var newNode = ARNode(
+        type: NodeType.webGLB,
+        uri:
+            "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
+        scale: Vector3(0.2, 0.2, 0.2),
+        position: Vector3(pos[0], pos[2], pos[1]),
+        rotation: Vector4(1.0, 0.0, 0.0, 0.0));
+    arObjectManager.addNode(newNode);
+    nodes[index] = newNode;
+  }
 }
+
