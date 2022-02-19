@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../satellites.dart';
+import '../src/satellites.dart';
 import 'tracking_map.dart';
 import 'hello_world.dart';
 

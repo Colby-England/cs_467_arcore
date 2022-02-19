@@ -24,6 +24,7 @@ Future<Map<String, dynamic>> getWhatsup() async {
   String category = '0'; // 0 for all categories
 
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
+
   var jsonRepsonse =
       await getJson('https://api.n2yo.com/rest/v1/satellite/above/'
           '$obsLat/$obsLng/$obsAlt/$radius/$category/&apiKey=$key');
