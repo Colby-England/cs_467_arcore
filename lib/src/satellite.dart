@@ -20,13 +20,11 @@ class Satellite {
   /* Json populated values */
   int satid = 0;
   String satname;
-  String intDesignator;
-  String launchDate;
   double satlat;
   double satlng;
-  double satalt;
   double sataz = 0.0;
   double utcTime = 0.0;
+  bool isAbove = true;
 
   /* Function Populated */
   final Site myLocation = Site.fromLatLngAlt(46.59271, -112.03611, 59 / 1000);
@@ -34,8 +32,7 @@ class Satellite {
   List<String> tleData = [];
   final Map<int, locationDetail> calculatedPositions = Map();
 
-  Satellite(this.satid, this.satname, this.intDesignator, this.launchDate,
-      this.satlat, this.satlng, this.satalt) {
+  Satellite(this.satid, this.satname, this.satlat, this.satlng) {
     // _getTle(satid); // API call to get TLE data for This satellite object.
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'utilities.dart';
+//import 'utilities.dart';
+import 'widget/search_sat.dart';
+import 'src/app.dart';
 
 class Counter {
   int value = 0;
@@ -10,7 +12,22 @@ class Counter {
 }
 
 void main() async {
-  runApp(SatTrack());
+  //runApp(const SatTrack());
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Satellite Tracker',
+        theme: ThemeData(primarySwatch: Colors.blueGrey),
+        routes: {
+          SearchSat.namedRoute: (context) => SearchSat(),
+          SatTrack.namedRoute: (context) => SatTrack(),
+        },
+        home: SearchSat());
+  }
 }
 
 

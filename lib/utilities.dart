@@ -4,6 +4,8 @@ export 'src/device_location.dart';
 export 'src/satellites.dart';
 export 'src/satellite.dart';
 
+export 'widget/search_sat.dart';
+
 export 'package:geolocator/geolocator.dart';
 
 export 'package:vector_math/vector_math_64.dart';

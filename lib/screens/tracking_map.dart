@@ -63,64 +63,13 @@ class _TrackingMap extends State<TrackingMap> {
 
   @override
   Widget build(BuildContext context) {
-    // get origin lat, lon, alt
-    // _determinePosition();
-
     Future<Position> origin = determinePosition();
     origin.then((value) {
       originAlt = value.altitude;
       originLat = value.latitude;
       originLon = value.longitude;
     });
-
-    return Scaffold(
-        appBar: AppBar(title: const Text('Tracking Map')),
-        body: Container(
-            color: const Color(0xFFFFFFFF).withOpacity(1.0),
-            child: Stack(children: [
-              ARView(
-                  onARViewCreated: onARViewCreated,
-                  planeDetectionConfig: PlaneDetectionConfig.none,
-                  showPlatformType: false),
-              Align(
-                  alignment: FractionalOffset.bottomCenter,
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                  onPressed: () => {showPos(context)},
-                                  child: const Text('Show Origin Location'))
-                            ])
-                      ]))
-            ])));
-  }
-
-  void showPos(BuildContext context) {
-    // set up the button
-    Widget okButton = TextButton(
-      child: const Text("OK"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    AlertDialog alert = AlertDialog(
-      title: const Text("Current location"),
-      content: Text('Lat: $originLat \n Lon: $originLon \n Alt: ${originAlt}m'),
-      actions: [
-        okButton,
-      ],
-    );
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
+    return userInterface();
   }
 
   void onARViewCreated(
@@ -193,6 +142,31 @@ class _TrackingMap extends State<TrackingMap> {
       this.arSessionManager.onError(error.toString());
     });
     onLoadObject();
+  }
+
+  void showPos(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: const Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Current location"),
+      content: Text('Lat: $originLat \n Lon: $originLon \n Alt: ${originAlt}m'),
+      actions: [
+        okButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   void showAlertDialog(BuildContext context, String title, String content,
@@ -272,5 +246,31 @@ class _TrackingMap extends State<TrackingMap> {
     newTransform.scale(newScale);
 
     localObjectNode.transform = newTransform;
+  }
+
+  Widget userInterface() {
+    return Scaffold(
+        appBar: AppBar(title: const Text('Tracking Map')),
+        body: Container(
+            color: const Color(0xFFFFFFFF).withOpacity(1.0),
+            child: Stack(children: [
+              ARView(
+                  onARViewCreated: onARViewCreated,
+                  planeDetectionConfig: PlaneDetectionConfig.none,
+                  showPlatformType: false),
+              Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () => {showPos(context)},
+                                  child: const Text('Show Origin Location'))
+                            ])
+                      ]))
+            ])));
   }
 }

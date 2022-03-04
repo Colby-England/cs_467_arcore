@@ -1,5 +1,4 @@
 import 'dart:convert' as convert;
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'device_location.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,22 +11,36 @@ Future<String> getTLE(int satid) async {
 }
 
 Future<Map<String, dynamic>> getWhatsup() async {
-  Position _currentPosition;
   Position origin = await determinePosition();
 
   String obsAlt = origin.altitude.toString();
   String obsLat = origin.latitude.toString();
   String obsLng = origin.longitude.toString();
 
-  String radius = '10';
+  String radius = '90';
 
-  String category = '0'; // 0 for all categories
+  String category = '18'; // 0 for all categories
 
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
-  var jsonRepsonse =
+  var jsonResponse =
       await getJson('https://api.n2yo.com/rest/v1/satellite/above/'
           '$obsLat/$obsLng/$obsAlt/$radius/$category/&apiKey=$key');
-  return (jsonRepsonse);
+  return (jsonResponse);
+}
+
+dynamic getPosition(int satid) async {
+  Position origin = await determinePosition();
+
+  String obsAlt = origin.altitude.toString();
+  String obsLat = origin.latitude.toString();
+  String obsLng = origin.longitude.toString();
+
+  String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
+
+  var jsonResponse =
+      await getJson('https://api.n2yo.com/rest/v1/satellite/positions/'
+          '$satid/$obsLat/$obsLng/$obsAlt/1/&apiKey=$key');
+  return jsonResponse;
 }
 
 dynamic getJson(String url) async {
@@ -36,8 +49,7 @@ dynamic getJson(String url) async {
   if (response.statusCode == 200) {
     return convert.jsonDecode(response.body);
   } else {
-    print('Request failed with status: ${response.statusCode}.');
-    exit(1);
+    return 'Request failed with status: ${response.statusCode}.';
   }
 }
 

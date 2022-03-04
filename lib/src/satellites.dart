@@ -39,6 +39,10 @@ class Satellites {
     }
   }
 
+  addSatellite(Satellite newSat) {
+    satellites.add(newSat);
+  }
+
   Satellite? getSatellitebyId(int satid) {
     /*
     returns nullSatellite if not found in list.
