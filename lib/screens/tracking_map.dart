@@ -1,11 +1,14 @@
 import 'dart:math';
 import 'dart:async';
 
+import 'package:cs_467_arcore/coordinate_transforms/lat_long.dart';
 import 'package:flutter/material.dart';
 import '../utilities.dart';
 
 class TrackingMap extends StatefulWidget {
-  const TrackingMap({Key? key}) : super(key: key);
+  final Satellites satData;
+
+  const TrackingMap(this.satData, {Key? key}) : super(key: key);
 
   @override
   _TrackingMap createState() => _TrackingMap();
@@ -22,9 +25,10 @@ class _TrackingMap extends State<TrackingMap> {
   final bool _showAnimatedGuide = false;
   final String _planeTexturePath = "Images/triangle.png";
   final bool _handleTaps = false;
-  late double originLat;
-  late double originLon;
-  late double originAlt;
+  late List<ARNode> nodes;
+  double bearing = 0.0;
+  int count = 0;
+  int countTwo = 0;
 
   Timer? _timer;
 
@@ -32,23 +36,48 @@ class _TrackingMap extends State<TrackingMap> {
   void initState() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       setState(() {
-        var newScale = Random().nextDouble() / 3;
-        var newTranslationAxis = Random().nextInt(3);
-        var newTranslationAmount = Random().nextDouble() / 3;
-        var newTranslation = Vector3(0, 0, 0);
-        newTranslation[newTranslationAxis] = newTranslationAmount;
-        var newRotationAxisIndex = Random().nextInt(3);
-        var newRotationAmount = Random().nextDouble();
-        var newRotationAxis = Vector3(0, 0, 0);
-        newRotationAxis[newRotationAxisIndex] = 1.0;
+        // first pass through place current sat position
+        if (count == 0) {
+          Future<double> compass = determineHeading();
+          compass.then((value) {
+            bearing = value;
+          });
 
-        final newTransform = Matrix4.identity();
+          nodes = List<ARNode>.filled(
+              widget.satData.satellites.length,
+              ARNode(
+                  type: NodeType.webGLB,
+                  uri:
+                      "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb"));
 
-        newTransform.setTranslation(newTranslation);
-        newTransform.rotate(newRotationAxis, newRotationAmount);
-        newTransform.scale(newScale);
-
-        localObjectNode.transform = newTransform;
+          for (int i = 0; i < widget.satData.satellites.length; i++) {
+            List<double> scale = transformCoords(
+                polarToCart(
+                    30,
+                    widget.satData.satellites[i].calculatedPositions[0]!
+                        .elevation,
+                    widget
+                        .satData.satellites[i].calculatedPositions[0]!.azimuth),
+                bearing,
+                1);
+            loadSatellites(scale, i);
+          }
+          count++;
+        } else {
+          for (int j = 0; j < widget.satData.satellites.length; j++) {
+            List<double> scale = transformCoords(
+                polarToCart(
+                    30,
+                    widget.satData.satellites[j].calculatedPositions[countTwo]!
+                        .elevation,
+                    widget.satData.satellites[j].calculatedPositions[countTwo]!
+                        .azimuth),
+                bearing,
+                1);
+            nodes[j].position = Vector3(scale[0], scale[2], scale[1]);
+          }
+          countTwo++;
+        }
       });
     });
     super.initState();
@@ -63,13 +92,62 @@ class _TrackingMap extends State<TrackingMap> {
 
   @override
   Widget build(BuildContext context) {
-    Future<Position> origin = determinePosition();
-    origin.then((value) {
-      originAlt = value.altitude;
-      originLat = value.latitude;
-      originLon = value.longitude;
+    // get origin lat, lon, alt
+    // _determinePosition();
+
+    Future<double> compass = determineHeading();
+    compass.then((value) {
+      bearing = value;
     });
-    return userInterface();
+
+    return Scaffold(
+        appBar: AppBar(title: const Text('Tracking Map')),
+        body: Container(
+            color: const Color(0xFFFFFFFF).withOpacity(1.0),
+            child: Stack(children: [
+              ARView(
+                  onARViewCreated: onARViewCreated,
+                  planeDetectionConfig: PlaneDetectionConfig.none,
+                  showPlatformType: false),
+              Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () => {showPos(context)},
+                                  child: const Text('Show Origin Location'))
+                            ])
+                      ]))
+            ])));
+  }
+
+  void showPos(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: const Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Current location"),
+      content: Text('Bearing: ${bearing}deg'),
+      actions: [
+        okButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   void onARViewCreated(
@@ -90,162 +168,18 @@ class _TrackingMap extends State<TrackingMap> {
         showWorldOrigin: _showWorldOrigin);
 
     this.arObjectManager.onInitialize();
-
-    this
-        .arLocationManager
-        .startLocationUpdates()
-        .then((value) => null)
-        .onError((error, stackTrace) {
-      switch (error.toString()) {
-        case 'Location services disabled':
-          {
-            showAlertDialog(
-                context,
-                "Action Required",
-                "To use cloud anchor functionality, please enable your location services",
-                "Settings",
-                this.arLocationManager.openLocationServicesSettings,
-                "Cancel");
-            break;
-          }
-
-        case 'Location permissions denied':
-          {
-            showAlertDialog(
-                context,
-                "Action Required",
-                "To use cloud anchor functionality, please allow the app to access your device's location",
-                "Retry",
-                this.arLocationManager.startLocationUpdates,
-                "Cancel");
-            break;
-          }
-
-        case 'Location permissions permanently denied':
-          {
-            showAlertDialog(
-                context,
-                "Action Required",
-                "To use cloud anchor functionality, please allow the app to access your device's location",
-                "Settings",
-                this.arLocationManager.openAppPermissionSettings,
-                "Cancel");
-            break;
-          }
-
-        default:
-          {
-            this.arSessionManager.onError(error.toString());
-            break;
-          }
-      }
-      this.arSessionManager.onError(error.toString());
-    });
-    onLoadObject();
   }
 
-  void showPos(BuildContext context) {
-    // set up the button
-    Widget okButton = TextButton(
-      child: const Text("OK"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    AlertDialog alert = AlertDialog(
-      title: const Text("Current location"),
-      content: Text('Lat: $originLat \n Lon: $originLon \n Alt: ${originAlt}m'),
-      actions: [
-        okButton,
-      ],
-    );
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  void showAlertDialog(BuildContext context, String title, String content,
-      String buttonText, Function buttonFunction, String cancelButtonText) {
-    // set up the buttons
-    Widget cancelButton = ElevatedButton(
-      child: Text(cancelButtonText),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    Widget actionButton = ElevatedButton(
-      child: Text(buttonText),
-      onPressed: () {
-        buttonFunction();
-        Navigator.of(context).pop();
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text(title),
-      content: Text(content),
-      actions: [
-        cancelButton,
-        actionButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  Future<void> onLoadObject() async {
+  Future<void> loadSatellites(List<double> pos, int index) async {
     var newNode = ARNode(
         type: NodeType.webGLB,
         uri:
             "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-        scale: Vector3(1.0, 1.0, 1.0),
-        position: Vector3(0.0, 30, 0.0),
+        scale: Vector3(0.3, 0.3, 0.3),
+        position: Vector3(pos[0], pos[2], pos[1]),
         rotation: Vector4(1.0, 0.0, 0.0, 0.0));
     arObjectManager.addNode(newNode);
-    localObjectNode = newNode;
-  }
-
-  Future<void> onMoveObject() async {
-    // var newNode = ARNode(
-    //   type: NodeType.webGLB,
-    //   uri: "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-    //   scale: Vector3(0.2, 0.2, 0.2),
-    //   position: Vector3(1.0, 0.0, 0.0),
-    //   rotation: Vector4(1.0, 0.0, 0.0, 0.0)
-    // );
-    // arObjectManager.removeNode(localObjectNode);
-    // arObjectManager.addNode(newNode);
-    // localObjectNode = newNode;
-    var newScale = Random().nextDouble() / 3;
-    var newTranslationAxis = Random().nextInt(3);
-    var newTranslationAmount = Random().nextDouble() / 3;
-    var newTranslation = Vector3(0, 0, 0);
-    newTranslation[newTranslationAxis] = newTranslationAmount;
-    var newRotationAxisIndex = Random().nextInt(3);
-    var newRotationAmount = Random().nextDouble();
-    var newRotationAxis = Vector3(0, 0, 0);
-    newRotationAxis[newRotationAxisIndex] = 1.0;
-
-    final newTransform = Matrix4.identity();
-
-    newTransform.setTranslation(newTranslation);
-    newTransform.rotate(newRotationAxis, newRotationAmount);
-    newTransform.scale(newScale);
-
-    localObjectNode.transform = newTransform;
+    nodes[index] = newNode;
   }
 
   Widget userInterface() {

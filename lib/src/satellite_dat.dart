@@ -19,9 +19,10 @@ Future<Map<String, dynamic>> getWhatsup() async {
 
   String radius = '90';
 
-  String category = '18'; // 0 for all categories
+  String category = '18'; // 0 for all categories, 18 for amateur radio sats
 
   String key = '8HEYM7-E8KFB7-AWGJTR-4U1C';
+
   var jsonResponse =
       await getJson('https://api.n2yo.com/rest/v1/satellite/above/'
           '$obsLat/$obsLng/$obsAlt/$radius/$category/&apiKey=$key');

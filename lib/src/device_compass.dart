@@ -1,7 +1,7 @@
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 
-Future<Object> determineHeading() async {
+Future<double> determineHeading() async {
   bool serviceEnabled;
   LocationPermission permission;
 

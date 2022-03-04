@@ -5,6 +5,8 @@ import 'satellite.dart';
 import '../models/user_sats.dart';
 import 'satellite_dat.dart';
 import '../db/savedSats.dart';
+import 'package:cs_467_arcore/src/device_location.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SatTrack extends StatelessWidget {
   static var namedRoute = 'satTrack';
@@ -14,7 +16,7 @@ class SatTrack extends StatelessWidget {
   Widget build(BuildContext context) {
     //final args = ModalRoute.of(context)!.settings.arguments as UserSat;
     return FutureBuilder<Satellites>(
-      future: satData(),
+      future: satData,
       builder: (context, AsyncSnapshot<Satellites> snapshot) {
         if (snapshot.hasData) {
           return HomeScreen(snapshot.data!);
@@ -25,7 +27,9 @@ class SatTrack extends StatelessWidget {
     );
   }
 
-  Future<Satellites> satData() async {
+  Future<Satellites> get satData async {
+    final Position originPos = await determinePosition();
+
     final Satellites satsAbove = Satellites();
     await satsAbove.getApiWhatsup(); // Call the Whatsup API
 
@@ -38,8 +42,10 @@ class SatTrack extends StatelessWidget {
     for (final Satellite sat in satsAbove.satellites) {
       await sat.getTle(sat.satid);
       sat.getPosition(
-          numberOfCalcs: 10,
-          durationMinutes: 1); // Calculate 10 positions in 1 minute intervals.
+          numberOfCalcs: 20,
+          durationMinutes: 1,
+          originPos:
+              originPos); // Calculate 10 positions in 1 minute intervals.
     }
     return satsAbove;
   }
