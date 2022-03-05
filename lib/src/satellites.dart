@@ -23,6 +23,7 @@ class Satellites {
     // Constructor, load the json
     //parseJson(jsonWhatsup);
   }
+
   Future<void> getApiWhatsup() async {
     jsonWhatsup = await getWhatsup();
     mapSatellite(jsonWhatsup);
@@ -53,5 +54,9 @@ class Satellites {
       }
     }
     return nullSat;
+  }
+
+  removeSatellite(Satellite sat) {
+    satellites.remove(sat);
   }
 }

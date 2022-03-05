@@ -1,3 +1,6 @@
+import 'package:cs_467_arcore/db/savedSats.dart';
+import 'package:cs_467_arcore/models/user_sats.dart';
+import 'package:cs_467_arcore/src/satellite.dart';
 import 'package:flutter/material.dart';
 import '../src/satellites.dart';
 // import '../satellites.dart';
@@ -5,9 +8,30 @@ import 'package:cs_467_arcore/src/satellites.dart';
 import 'tracking_map.dart';
 import 'hello_world.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   Satellites satData;
+
   HomeScreen(this.satData, {Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  late Satellites sats;
+
+  @override
+  void initState() {
+    super.initState();
+    sats = widget.satData;
+  }
+
+  void refresh(Satellite sat) {
+    setState(() {
+      sats.removeSatellite(sat);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +41,7 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => TrackingMap(satData)));
+                  builder: (context) => TrackingMap(sats)));
             },
             title: const Text('Tracking Map'),
           ),
@@ -36,7 +60,7 @@ class HomeScreen extends StatelessWidget {
                     //decoration: BoxDecoration(
                     //  borderRadius: BorderRadius.all(Radius.circular(10))),
                     child: SingleChildScrollView(
-                        child: Column(children: getUserSats(satData))))),
+                        child: Column(children: getUserSats(sats, refresh))))),
             Padding(
                 padding: const EdgeInsets.all(10),
                 child: Container(
@@ -47,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                         child: Padding(
                             padding: EdgeInsets.all(10),
                             child: Column(
-                              children: getSatAboveData(satData),
+                              children: getSatAboveData(sats),
                             )))))
           ])
         ]));
@@ -66,22 +90,27 @@ List<Widget> getSatAboveData(Satellites satData) {
   return rlist;
 }
 
-List<Widget> getUserSats(satData) {
+List<Widget> getUserSats(satData, refresh) {
   List<Widget> rlist = [Text('My Satellites', style: TextStyle(fontSize: 20))];
   for (var sat in satData.satellites) {
     if (!sat.isAbove) {
-      rlist.add(listTileSat(sat));
+      rlist.add(listTileSat(sat, refresh));
     }
   }
   return rlist;
 }
 
-Widget listTileSat(sat) {
+Widget listTileSat(sat, refresh) {
   return ListTile(
       title: Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text("SatName: ${sat.satname}"),
-          Icon(Icons.highlight_remove)
+          GestureDetector(
+            onTap: () async {
+              await deleteSat(sat.satid);
+              refresh(sat);
+            },
+            child: const Icon(Icons.highlight_remove))
         ])
       ]),
       subtitle: Column(children: [
@@ -90,6 +119,11 @@ Widget listTileSat(sat) {
         Text("Longitude: ${sat.satlat.toString()}",
             style: TextStyle(color: Colors.black))
       ]));
+}
+
+Future<void> deleteSat(int satID) async {
+  var db = await DbHelper.instance;
+  await db.delete(satID);
 }
 
 List<RenderObjectWidget> listSat(sat) {

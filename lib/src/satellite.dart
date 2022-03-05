@@ -49,7 +49,7 @@ class Satellite {
     tleData = ls.convert(apiString);
   }
 
-  void getPosition({int numberOfCalcs = 5, int durationMinutes = 1, Position? originPos}) {
+  void getPosition({int numberOfCalcs = 5, int durationMinutes = 1, int durationSeconds = 5, Position? originPos}) {
     var startTime = DateTime.now();
 
     Site myLocation = Site.fromLatLngAlt(originPos!.latitude, originPos.longitude, originPos.altitude / 1000);
@@ -65,7 +65,7 @@ class Satellite {
       final Orbit orbit = Orbit(tleSGP4);
 
       utcTime = JulianDays()
-          .getJulian(startTime.add(Duration(minutes: durationMinutes)));
+          .getJulian(startTime.add(Duration(minutes: durationMinutes, seconds: durationSeconds)));
 
       final Eci eciPos =
           orbit.getPosition((utcTime - orbit.epoch().getDate()) * MIN_PER_DAY);
