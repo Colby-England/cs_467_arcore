@@ -5,11 +5,18 @@ import '../src/satellite.dart';
 import '../src/satellite_dat.dart';
 import '../src/app.dart';
 import '../db/savedSats.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class SearchSat extends StatelessWidget {
+class SearchSat extends StatefulWidget {
   SearchSat({Key? key}) : super(key: key);
-  final formKey = GlobalKey<FormState>();
   static var namedRoute = 'searchSat';
+
+  @override
+  State<SearchSat> createState() => _SearchSatState();
+}
+
+class _SearchSatState extends State<SearchSat> {
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +39,7 @@ class SearchSat extends StatelessWidget {
                 labelText: 'NORAD ID', border: OutlineInputBorder()),
             onSaved: (value) async {
               userSat.satid = int.parse(value!);
-              print(userSat.satId);
+              toast('$value saved!');
             },
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -47,18 +54,8 @@ class SearchSat extends StatelessWidget {
           onTap: () async {
             if (formKey.currentState!.validate()) {
               formKey.currentState!.save();
-/*               var db = await openDatabase('savedSats.db', version: 1,
-                  onCreate: (db, version) async {
-                await db.execute(
-                    'CREATE TABLE IF NOT EXISTS satellites(id INTEGER PRIMARY KEY AUTOINCREMENT, norad_id TEXT)');
-              });
-              await db.transaction((txn) async {
-                await txn.rawInsert(
-                    'INSERT INTO journal_entries(norad_id) VALUES (?)',
-                    [userSat.satId]);
-              });
-              await db.close(); */
-              print(userSat.satId);
+              String value = userSat.satId.toString();
+              toast('$value saved!');
               var db = await DbHelper.instance;
               await db.create(userSat);
             }
@@ -73,9 +70,16 @@ class SearchSat extends StatelessWidget {
               }))
     ]);
   }
-}
 
-/* to do :
-- change the way user sats are loaded to account for the db
-- add the ability to remove a satellite from list
-*/
+  Future<bool?> toast(String message) {
+    Fluttertoast.cancel();
+    return Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 4,
+        backgroundColor: Colors.green[300],
+        textColor: Colors.black,
+        fontSize: 15.0);
+  }
+}

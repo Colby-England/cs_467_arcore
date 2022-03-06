@@ -44,6 +44,7 @@ dependencies:
   ar_flutter_plugin: ^0.6.2
   flutter_compass: ^0.7.0
   sqflite: ^2.0.2
+  fluttertoast: ^8.0.9
 
 dev_dependencies:
   flutter_test:
