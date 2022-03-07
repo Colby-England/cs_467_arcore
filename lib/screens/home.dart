@@ -6,7 +6,6 @@ import '../src/satellites.dart';
 // import '../satellites.dart';
 import 'package:cs_467_arcore/src/satellites.dart';
 import 'tracking_map.dart';
-import 'hello_world.dart';
 
 class HomeScreen extends StatefulWidget {
   Satellites satData;
@@ -44,13 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context) => TrackingMap(sats)));
             },
             title: const Text('Tracking Map'),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const DebugOptionsWidget()));
-            },
-            title: Text('AR Hello World'),
           ),
           Column(children: [
             Padding(

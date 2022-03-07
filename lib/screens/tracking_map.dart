@@ -21,7 +21,7 @@ class _TrackingMap extends State<TrackingMap> {
   late ARNode localObjectNode;
   final bool _showFeaturePoints = false;
   final bool _showPlanes = false;
-  final bool _showWorldOrigin = true;
+  final bool _showWorldOrigin = false;
   final bool _showAnimatedGuide = false;
   final String _planeTexturePath = "Images/triangle.png";
   final bool _handleTaps = false;
@@ -31,11 +31,15 @@ class _TrackingMap extends State<TrackingMap> {
   int countTwo = 0;
 
   Timer? _timer;
+  Timer? _oneTime;
 
   @override
   void initState() {
+    super.initState();
+    
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       setState(() {
+        Stopwatch stopwatch = Stopwatch()..start();
         // first pass through place current sat position
         if (count == 0) {
           Future<double> compass = determineHeading();
@@ -54,10 +58,9 @@ class _TrackingMap extends State<TrackingMap> {
             List<double> scale = transformCoords(
                 polarToCart(
                     30,
-                    widget.satData.satellites[i].calculatedPositions[0]!
-                        .elevation,
-                    widget
-                        .satData.satellites[i].calculatedPositions[0]!.azimuth),
+                    widget.satData.satellites[i].calculatedPositions[0]!.elevation,
+                    widget.satData.satellites[i].calculatedPositions[0]!.azimuth
+                ),
                 bearing,
                 1);
             loadSatellites(scale, i);
@@ -68,19 +71,18 @@ class _TrackingMap extends State<TrackingMap> {
             List<double> scale = transformCoords(
                 polarToCart(
                     30,
-                    widget.satData.satellites[j].calculatedPositions[countTwo]!
-                        .elevation,
-                    widget.satData.satellites[j].calculatedPositions[countTwo]!
-                        .azimuth),
+                    widget.satData.satellites[j].calculatedPositions[countTwo]!.elevation,
+                    widget.satData.satellites[j].calculatedPositions[countTwo]!.azimuth
+                ),
                 bearing,
                 1);
             nodes[j].position = Vector3(scale[0], scale[2], scale[1]);
           }
           countTwo++;
         }
+      print('${stopwatch.elapsed}');
       });
     });
-    super.initState();
   }
 
   @override
@@ -95,10 +97,10 @@ class _TrackingMap extends State<TrackingMap> {
     // get origin lat, lon, alt
     // _determinePosition();
 
-    Future<double> compass = determineHeading();
-    compass.then((value) {
-      bearing = value;
-    });
+    // Future<double> compass = determineHeading();
+    // compass.then((value) {
+    //   bearing = value;
+    // });
 
     return Scaffold(
         appBar: AppBar(title: const Text('Tracking Map')),
@@ -175,7 +177,7 @@ class _TrackingMap extends State<TrackingMap> {
         type: NodeType.webGLB,
         uri:
             "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF-Binary/Duck.glb",
-        scale: Vector3(0.3, 0.3, 0.3),
+        scale: Vector3(0.8, 0.8, 0.8),
         position: Vector3(pos[0], pos[2], pos[1]),
         rotation: Vector4(1.0, 0.0, 0.0, 0.0));
     arObjectManager.addNode(newNode);

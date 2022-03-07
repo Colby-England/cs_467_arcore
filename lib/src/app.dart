@@ -42,9 +42,9 @@ class SatTrack extends StatelessWidget {
     for (final Satellite sat in satsAbove.satellites) {
       await sat.getTle(sat.satid);
       sat.getPosition(
-          numberOfCalcs: 60,
-          durationMinutes: 0,
-          durationSeconds: 5,
+          numberOfCalcs: 300,
+          durationMinutes: 1,
+          durationSeconds: 0,
           originPos:
               originPos); // Calculate 10 positions in 1 minute intervals.
     }
