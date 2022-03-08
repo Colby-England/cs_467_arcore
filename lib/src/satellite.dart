@@ -54,6 +54,9 @@ class Satellite {
 
     Site myLocation = Site.fromLatLngAlt(originPos!.latitude, originPos.longitude, originPos.altitude / 1000);
 
+    final durSec = durationSeconds;
+    final durMin = durationMinutes;
+
     int i = 0;
     while (i <= numberOfCalcs) {
       /// Parse the TLE
@@ -93,7 +96,8 @@ class Satellite {
       newLocation.azimuth = rad2deg(topo.az);
       newLocation.elevation = rad2deg(topo.el);
       calculatedPositions[i] = newLocation;
-      durationMinutes += durationMinutes;
+      durationMinutes += durMin;
+      durationSeconds += durSec;
       i += 1;
     }
   }
